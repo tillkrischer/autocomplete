@@ -5,6 +5,7 @@ import Popper from '@mui/material/Popper';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
 
 const LISTBOX_PADDING = 8; // px
 
@@ -29,7 +30,6 @@ const OuterElementType = React.forwardRef<HTMLDivElement>((props, ref) => {
   const outerProps = React.useContext(OuterElementContext);
   return <div ref={ref} {...props} {...outerProps} />;
 });
-
 
 const ListboxComponent = React.forwardRef<
   HTMLDivElement,
@@ -77,15 +77,24 @@ const OPTIONS = Array.from(new Array(10000))
     a.toUpperCase().localeCompare(b.toUpperCase())
   );
 
-const StyledPopper = styled(Popper)({
-  [`& .${autocompleteClasses.listbox}`]: {
-    boxSizing: 'border-box',
-    '& ul': {
-      padding: 0,
-      margin: 0,
+const useStyles = makeStyles()({
+  root: {
+    [`& .${autocompleteClasses.listbox}`]: {
+      boxSizing: 'border-box',
+      '& ul': {
+        padding: 0,
+        margin: 0,
+      },
     },
   },
 });
+
+const StyledPopper = (props: PopperProps) => {
+  const { className } = props;
+  const { classes, cx } = useStyles();
+
+  return (<Popper {...props} className={cx(classes.root, className)} />);
+};
 
 export default function Virtualize() {
   const [value, setValue] = React.useState<string | null>(null);
@@ -111,7 +120,7 @@ export default function Virtualize() {
           setValue(newValue);
         }}
       />
-      {value ?? "not set yet"}
+      {value ?? 'not set yet'}
     </>
   );
 }
